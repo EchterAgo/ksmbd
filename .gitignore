@@ -1,0 +1,8 @@
+*.o
+*.cmd
+Module.symvers
+ksmbd.ko
+ksmbd.mod
+ksmbd.mod.c
+modules.order
+ksmbd_spnego_negtoken*.asn1.*
