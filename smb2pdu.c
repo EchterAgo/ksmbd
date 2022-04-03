@@ -13,6 +13,7 @@
 #include <linux/falloc.h>
 #include <linux/crc32.h>
 #include <linux/mount.h>
+#include <linux/if_vlan.h>
 
 #include "glob.h"
 #include "smb2pdu.h"
@@ -7440,7 +7441,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
 {
 	struct network_interface_info_ioctl_rsp *nii_rsp = NULL;
 	int nbytes = 0;
-	struct net_device *netdev;
+	struct net_device *netdev, *real_netdev;
 	struct sockaddr_storage_rsp *sockaddr_storage;
 	unsigned int flags;
 	unsigned long long speed;
@@ -7467,9 +7468,17 @@ ipv6_retry:
 		nii_rsp->IfIndex = cpu_to_le32(netdev->ifindex);
 
 		nii_rsp->Capability = 0;
-		if (netdev->real_num_tx_queues > 1)
+
+		real_netdev = netdev;
+#if IS_ENABLED(CONFIG_VLAN_8021Q)
+		if (is_vlan_dev(netdev)) {
+			real_netdev = vlan_dev_real_dev(netdev);
+		}
+#endif
+
+		if (real_netdev->real_num_tx_queues > 1)
 			nii_rsp->Capability |= cpu_to_le32(RSS_CAPABLE);
-		if (ksmbd_rdma_capable_netdev(netdev))
+		if (ksmbd_rdma_capable_netdev(real_netdev))
 			nii_rsp->Capability |= cpu_to_le32(RDMA_CAPABLE);
 
 		nii_rsp->Next = cpu_to_le32(152);
