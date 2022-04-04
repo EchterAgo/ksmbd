@@ -7476,13 +7476,14 @@ ipv6_retry:
 		}
 #endif
 
+		nii_rsp->RSSQueueCount = real_netdev->real_num_tx_queues;
+
 		if (real_netdev->real_num_tx_queues > 1)
 			nii_rsp->Capability |= cpu_to_le32(RSS_CAPABLE);
 		if (ksmbd_rdma_capable_netdev(real_netdev))
 			nii_rsp->Capability |= cpu_to_le32(RDMA_CAPABLE);
 
 		nii_rsp->Next = cpu_to_le32(152);
-		nii_rsp->Reserved = 0;
 
 		if (netdev->ethtool_ops->get_link_ksettings) {
 			struct ethtool_link_ksettings cmd;

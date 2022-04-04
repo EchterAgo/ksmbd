@@ -964,7 +964,7 @@ struct network_interface_info_ioctl_rsp {
 	__le32 Next; /* next interface. zero if this is last one */
 	__le32 IfIndex;
 	__le32 Capability; /* RSS or RDMA Capable */
-	__le32 Reserved;
+	__le32 RSSQueueCount;
 	__le64 LinkSpeed;
 	char	SockAddr_Storage[128];
 } __packed;
